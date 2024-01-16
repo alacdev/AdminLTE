@@ -82,7 +82,43 @@ class FrontController{
                     $controlador = new \Com\Daw2\Controllers\NotasController();
                     $controlador->procesarFormulario();
                 }
-                , 'post');   
+                , 'post');  
+                
+        Route::add('/usuarios', 
+                function(){
+                    $controlador = new \Com\Daw2\Controllers\UsuariosController();
+                    $controlador->mostrarUsuarios();
+                }
+                , 'get');   
+                
+        Route::add('/usuariosOrdenados', 
+                function(){
+                    $controlador = new \Com\Daw2\Controllers\UsuariosController();
+                    $controlador->mostrarUsuariosOrdenados();
+                }
+                , 'get'); 
+                
+        Route::add('/usuariosStandard', 
+                function(){
+                    $controlador = new \Com\Daw2\Controllers\UsuariosController();
+                    $controlador->mostrarUsuariosEstandar();
+                }
+                , 'get');   
+                
+        Route::add('/usuariosCarlos', 
+                function(){
+                    $controlador = new \Com\Daw2\Controllers\UsuariosController();
+                    $controlador->mostrarUsuariosCarlos();
+                }
+                , 'get'); 
+                
+        Route::add('/usuariosConFiltros', 
+                function(){
+                    $controlador = new \Com\Daw2\Controllers\UsuariosController();
+                    $controlador->mostrarUsuariosFiltrados();
+                }
+                , 'get');                 
+                
                 
         Route::pathNotFound(
             function(){
