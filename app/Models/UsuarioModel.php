@@ -52,14 +52,14 @@ class UsuarioModel extends \Com\Daw2\Core\BaseDbModel {
             $conditions[] = "salarioBruto <= :maxSalary";
             $vars['maxSalary'] = $maxSalary;
         }
-        
+
         $query .= implode(" AND ", $conditions) . " ORDER BY salarioBruto";
-        
+
         $stmt = $this->pdo->prepare($query);
         $stmt->execute($vars);
         return $stmt->fetchAll();
     }
-    
+
     function getUsersFilteredByRetentionRange(?int $minRet, ?int $maxRet): array {
         $query = self::SELECT_FROM . " WHERE ";
         $conditions = [];
@@ -72,9 +72,9 @@ class UsuarioModel extends \Com\Daw2\Core\BaseDbModel {
             $conditions[] = "retencionIRPF <= :maxRet";
             $vars['maxRet'] = $maxRet;
         }
-        
+
         $query .= implode(" AND ", $conditions) . " ORDER BY retencionIRPF";
-        
+
         $stmt = $this->pdo->prepare($query);
         $stmt->execute($vars);
         return $stmt->fetchAll();
