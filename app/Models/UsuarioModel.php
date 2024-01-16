@@ -60,7 +60,7 @@ class UsuarioModel extends \Com\Daw2\Core\BaseDbModel {
         return $stmt->fetchAll();
     }
     
-    function getUsersFilteredByRetentionRange(?float $minRet, ?float $maxRet): array {
+    function getUsersFilteredByRetentionRange(?int $minRet, ?int $maxRet): array {
         $query = self::SELECT_FROM . " WHERE ";
         $conditions = [];
         $vars = [];

@@ -44,23 +44,23 @@
                                     <label for="salario">Salario:</label>
                                     <div class="row">
                                         <div class="col-6">
-                                            <input type="text" class="form-control" name="maxSalar" id="maxSalar" value="<?php echo (isset($input['maxSalar'])) ? $input['maxSalar'] : ''; ?>" placeholder="Mayor que __ €" />
+                                            <input type="text" class="form-control" name="minSalary" id="minSalary" value="<?php echo (isset($input['minSalary'])) ? $input['minSalary'] : ''; ?>" placeholder="Mayor que __ €" />
                                         </div>
                                         <div class="col-6">
-                                            <input type="text" class="form-control" name="minSalar" id="minSalar" value="<?php echo (isset($input['minSalar'])) ? $input['minSalar'] : ''; ?>" placeholder="Menor que __ €" />
+                                            <input type="text" class="form-control" name="maxSalary" id="maxSalary" value="<?php echo (isset($input['maxSalary'])) ? $input['maxSalary'] : ''; ?>" placeholder="Menor que __ €" />
                                         </div>
                                     </div>
                                 </div>
                             </div>   
                             <div class="col-12 col-lg-12">
                                 <div class="mb-3">
-                                    <label for="salario">Retención:</label>
+                                    <label for="retencion">Retención:</label>
                                     <div class="row">
                                         <div class="col-6">
-                                            <input type="text" class="form-control" name="maxRet" id="maxRet" value="<?php echo (isset($input['maxRet'])) ? $input['maxRet'] : ''; ?>" placeholder="Mayor que __ %" />
+                                            <input type="text" class="form-control" name="minRet" id="minRet" value="<?php echo (isset($input['minRet'])) ? $input['minRet'] : ''; ?>" placeholder="Mayor que __ %" />
                                         </div>
                                         <div class="col-6">
-                                            <input type="text" class="form-control" name="minRet" id="minRet" value="<?php echo (isset($input['minRet'])) ? $input['minRet'] : ''; ?>" placeholder="Menor que __ %" />
+                                            <input type="text" class="form-control" name="maxRet" id="maxRet" value="<?php echo (isset($input['maxRet'])) ? $input['maxRet'] : ''; ?>" placeholder="Menor que __ %" />
                                         </div>
                                     </div>
                                 </div>

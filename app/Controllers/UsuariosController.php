@@ -73,16 +73,15 @@ class UsuariosController extends \Com\Daw2\Core\BaseController {
             $usuarios = $userModel->getUsersFilteredByRol((int) $_GET['id_rol']);
         } else if (!empty($_GET['username']) && filter_var($_GET['username'])) {
             $usuarios = $userModel->getUsersFilteredByUsername($_GET['username']);
-        } else if ((!empty($_GET['minSalar']) && is_numeric($_GET['minSalar'])) || (!empty($_GET['maxSalar']) && is_numeric($_GET['maxSalar']))) {
-            
-            $min = (!empty($_GET['minSalar']) && is_numeric($_GET['minSalar'])) ? (float) $_GET['minSalar'] : NULL;
-            $max = (!empty($_GET['maxSalar']) && is_numeric($_GET['maxSalar'])) ? (float) $_GET['maxSalar'] : NULL;
+        } else if ((!empty($_GET['minSalary']) && is_numeric($_GET['minSalary'])) || (!empty($_GET['maxSalary']) && is_numeric($_GET['maxSalary']))) {
+            $minSalary = (!empty($_GET['minSalary']) && is_numeric($_GET['minSalary'])) ? (float) $_GET['minSalary'] : NULL;
+            $maxSalary = (!empty($_GET['maxSalary']) && is_numeric($_GET['maxSalary'])) ? (float) $_GET['maxSalary'] : NULL;
 
-            $usuarios = $userModel->getUsersFilteredBySalaryRange($min, $max);
+            $usuarios = $userModel->getUsersFilteredBySalaryRange($minSalary, $maxSalary);
         } else if ((!empty($_GET['minRet']) && is_numeric($_GET['minRet'])) || (!empty($_GET['maxRet']) && is_numeric($_GET['maxRet']))) {
-            
-            $min = (!empty($_GET['minRet']) && is_numeric($_GET['minRet'])) ? (float) $_GET['minRet'] : NULL;
-            $max = (!empty($_GET['maxRet']) && is_numeric($_GET['maxRet'])) ? (float) $_GET['maxRet'] : NULL;
+
+            $min = (!empty($_GET['minRet']) && is_numeric($_GET['minRet'])) ? (int) $_GET['minRet'] : NULL;
+            $max = (!empty($_GET['maxRet']) && is_numeric($_GET['maxRet'])) ? (int) $_GET['maxRet'] : NULL;
 
             $usuarios = $userModel->getUsersFilteredByRetentionRange($min, $max);
         } else {
