@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Com\Daw2\Controllers;
 
+use \PDO;
+
 class UsuariosController extends \Com\Daw2\Core\BaseController {
 
     function mostrarUsuarios(): void {
@@ -65,70 +67,16 @@ class UsuariosController extends \Com\Daw2\Core\BaseController {
     function mostrarUsuariosFiltrados(): void {
         $rolModel = new \Com\Daw2\Models\RolModel();
         $roles = $rolModel->getRolls();
+        $countryModel = new \Com\Daw2\Models\CountryModel();
+        $countries = $countryModel->getCountries();
 
         $input = filter_var_array($_GET, FILTER_SANITIZE_STRING);
 
         $userModel = new \Com\Daw2\Models\UsuarioModel();
-//        if (!empty($_GET['id_rol']) && filter_var($_GET['id_rol'], FILTER_VALIDATE_INT)) {
-//            $usuarios = $userModel->getUsersFilteredByRol((int) $_GET['id_rol']);
-//        } else if (!empty($_GET['username']) && filter_var($_GET['username'])) {
-//            $usuarios = $userModel->getUsersFilteredByUsername($_GET['username']);
-//        } else if ((!empty($_GET['minSalary']) && is_numeric($_GET['minSalary'])) || (!empty($_GET['maxSalary']) && is_numeric($_GET['maxSalary']))) {
-//            $minSalary = (!empty($_GET['minSalary']) && is_numeric($_GET['minSalary'])) ? (float) $_GET['minSalary'] : NULL;
-//            $maxSalary = (!empty($_GET['maxSalary']) && is_numeric($_GET['maxSalary'])) ? (float) $_GET['maxSalary'] : NULL;
-//
-//            $usuarios = $userModel->getUsersFilteredBySalaryRange($minSalary, $maxSalary);
-//        } else if ((!empty($_GET['minRet']) && is_numeric($_GET['minRet'])) || (!empty($_GET['maxRet']) && is_numeric($_GET['maxRet']))) {
-//
-//            $min = (!empty($_GET['minRet']) && is_numeric($_GET['minRet'])) ? (int) $_GET['minRet'] : NULL;
-//            $max = (!empty($_GET['maxRet']) && is_numeric($_GET['maxRet'])) ? (int) $_GET['maxRet'] : NULL;
-//
-//            $usuarios = $userModel->getUsersFilteredByRetentionRange($min, $max);
-//        } else {
-//            $usuarios = $userModel->getUsers();
-//        }
-//        
-//        
+        $usuarios = $userModel->filter($_GET);
         
-        //INICIO TODOS LOS FILTROS JUNTOS
-
-        $conditions = [];
-        $params = [];
-
-        if (!empty($_GET['id_rol']) && filter_var($_GET['id_rol'], FILTER_VALIDATE_INT)) {
-            $conditions[] = 'ar.id_rol = ?';
-            $params[] = '%' . (int) $_GET['id_rol'] . "%";
-        }
-
-        if (!empty($_GET['username']) && filter_var($_GET['username'])) {
-            $conditions[] = 'username LIKE ?';
-            $params[] = '%' . $_GET['username'] . "%";
-        }
-
-        if ((!empty($_GET['minSalary']) && is_numeric($_GET['minSalary'])) || (!empty($_GET['maxSalary']) && is_numeric($_GET['maxSalary']))) {
-            $conditions[] = 'salarioBruto BETWEEN ? AND ?';
-            $params[] = $_GET['minSalary'];
-            $params[] = $_GET['maxSalary'];
-        }
-        
-        if ((!empty($_GET['minRet']) && is_numeric($_GET['minRet'])) || (!empty($_GET['maxRet']) && is_numeric($_GET['maxRet']))) {
-            $conditions[] = 'salarioBruto BETWEEN ? AND ?';
-            $params[] = $_GET['minRet'];
-            $params[] = $_GET['maxRet'];
-        }
-
-        $query = "SELECT * FROM usuarios";
-
-        if ($conditions) {
-            $query .= " WHERE " . implode(" AND ", $conditions);
-        }
-
-        $stmt = $pdo->prepare($query);
-        $stmt->execute($params);
-        $data = $stmt->fetchAll();
-        
-        
-        //FIN TODOS LOS FILTROS JUNTOS
+        $copyGet = $_GET;
+        unset($copyGet['order']);
 
         $data = [];
         $data['titulo'] = 'Usuarios con filtros';
@@ -136,7 +84,11 @@ class UsuariosController extends \Com\Daw2\Core\BaseController {
         $data['breadcrumb'] = ['Usuarios con filtros'];
         $data['usuarios'] = $usuarios;
         $data['roles'] = $roles;
-        $data['js'] = array('plugins/datatables/jquery.dataTables.min.js', 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js', 'assets/js/pages/usuarios.view.js');
+        $data['countries'] = $countries;
+        $data['input'] = $input;
+        $data['order'] = $userModel->getOrder($_GET);
+        $data['parameters'] = http_build_query($copyGet);
+        $data['js'] = array('plugins/select2/js/select2.full.min.js', 'assets/js/pages/usuarios.view.js', 'assets/js/pages/usuariosConFiltros.view.js');
 
         $this->view->showViews(array('templates/header.view.php', 'usuariosConFiltros.view.php', 'templates/footer.view.php'), $data);
     }

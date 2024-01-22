@@ -45,7 +45,9 @@
 <?php
 if (isset($js) && is_array($js)) {
     foreach ($js as $script) {
-        echo '<script src="' . $script . '"></script>';
+        ?>
+        <script src="<?php echo $script; ?>"></script>
+        <?php
     }
 }
 ?>
