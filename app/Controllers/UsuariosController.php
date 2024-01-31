@@ -74,9 +74,12 @@ class UsuariosController extends \Com\Daw2\Core\BaseController {
 
         $userModel = new \Com\Daw2\Models\UsuarioModel();
         $usuarios = $userModel->filter($_GET);
+        $numRegs = $userModel->getNumRegFilter($_GET);
         
         $copyGet = $_GET;
         unset($copyGet['order']);
+        
+        $pagMax = ceil ($numRegs[0]['total'] / $_ENV['page.size']);
 
         $data = [];
         $data['titulo'] = 'Usuarios con filtros';
@@ -87,6 +90,9 @@ class UsuariosController extends \Com\Daw2\Core\BaseController {
         $data['countries'] = $countries;
         $data['input'] = $input;
         $data['order'] = $userModel->getOrder($_GET);
+        $data['numRegs'] = $numRegs[0]['total'];
+        $data['pagActual'] = $userModel->getPage($_GET);
+        $data['pagMax'] = $pagMax;
         $data['parameters'] = http_build_query($copyGet);
         $data['js'] = array('plugins/select2/js/select2.full.min.js', 'assets/js/pages/usuarios.view.js', 'assets/js/pages/usuariosConFiltros.view.js');
 

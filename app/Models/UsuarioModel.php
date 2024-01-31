@@ -7,6 +7,7 @@ use \PDO;
 class UsuarioModel extends \Com\Daw2\Core\BaseDbModel {
 
     const SELECT_FROM = "SELECT u.*, ar.nombre_rol as rol, ac.country_name FROM usuario u LEFT JOIN aux_rol ar ON ar.id_rol = u.id_rol LEFT JOIN aux_countries ac ON u.id_country = ac.id";
+    const SELECT_COUNT = "SELECT COUNT(*) as total FROM usuario u LEFT JOIN aux_rol ar ON ar.id_rol = u.id_rol LEFT JOIN aux_countries ac ON u.id_country = ac.id";
     const ORDER_ARRAY = ['username', 'rol', 'salarioBruto', 'retencionIRPF', 'country_name'];
 
     function getUsers(): array {
@@ -87,7 +88,13 @@ class UsuarioModel extends \Com\Daw2\Core\BaseDbModel {
         return $stmt->fetchAll();
     }
 
-    function filter(array $filtros): array {
+    
+    /**
+     * Calcula las condiciones y las variables en base a los filtros
+     * @param array $filtros Condiciones que tienen que cumplir
+     * @return array con las condiciones y las variables necesarias
+     */
+    private function select(array $filtros): array {
         $condiciones = [];
         $vars = [];
         if (!empty($filtros['id_rol']) && filter_var($filtros['id_rol'], FILTER_VALIDATE_INT)) {
@@ -127,31 +134,95 @@ class UsuarioModel extends \Com\Daw2\Core\BaseDbModel {
             $condiciones[] = "id_country IN (" . implode(", ", $ids) . ")";
             $vars = array_merge($vars, $bind);
         }
+        return [
+            'condiciones' => $condiciones,
+            'vars' => $vars
+        ];
+    }
 
+    /**
+     * Filtra por las condiciones pasadas
+     * @param array $filtros Condiciones que se pasan
+     * @return array Devuelve los datos de los usuarios que cumplen las condiciones
+     */
+    function filter(array $filtros): array {
+
+        $condsVars = $this->select($filtros);
         $order = $this->getOrder($filtros);
 
-        $campoOrder = self::ORDER_ARRAY[$order - 1];
+        $campoOrder = self::ORDER_ARRAY[abs($order) - 1];
 
-        if (empty($condiciones)) {
-            $query = self::SELECT_FROM . " ORDER BY $campoOrder";
+        if (empty($condsVars['condiciones'])) {
+            $query = self::SELECT_FROM . " ORDER BY $campoOrder " . $this->getSentido($order);
             return $this->pdo->query($query)->fetchAll();
         } else {
-            $query = self::SELECT_FROM . " WHERE " . implode(" AND ", $condiciones) . " ORDER BY $campoOrder";
-            
-            return $this->executeQuery($query, $vars);
+            $query = self::SELECT_FROM . " WHERE " . implode(" AND ", $condsVars['condiciones']) . " ORDER BY $campoOrder " . $this->getSentido($order);
+
+            return $this->executeQuery($query, $condsVars['vars']);
+        }
+    }
+    
+    /*
+     * Devuelve el número de registros que cumplen las condiciones
+     * @param type $filtros Los filtros a aplicar
+     * @return int Número de registros que cumplen la condición 
+     */
+    function getNumRegFilter(array $filtros): array {
+
+        $condsVars = $this->select($filtros);
+        $order = $this->getOrder($filtros);
+
+        $campoOrder = self::ORDER_ARRAY[abs($order) - 1];
+
+        if (empty($condsVars['condiciones'])) {
+            $query = self::SELECT_COUNT . " ORDER BY $campoOrder " . $this->getSentido($order);
+            return $this->pdo->query($query)->fetchAll();
+//            return (int) $this->pdo->prepare($query)->execute($condsVars['vars'])->fetch()['total'];
+        } else {
+            $query = self::SELECT_COUNT . " WHERE " . implode(" AND ", $condsVars['condiciones']) . " ORDER BY $campoOrder " . $this->getSentido($order);
+            return $this->pdo->query($query)->fetchAll();
+//            return (int) $this->pdo->prepare($query)->execute($condsVars['vars'])->fetch()['total'];
         }
     }
 
+    /**
+     * Devuelve el número de columnas que tienen el array
+     * @return int
+     */
     public static function getMaxColumnOrder(): int {
         return count(self::ORDER_ARRAY);
     }
 
+    /**
+     * 
+     * @param array $filtros
+     * @return int 
+     */
     public function getOrder(array $filtros): int {
-        if (!isset($filtros['order']) || $filtros['order'] < 1 || $filtros['order'] > count(self::ORDER_ARRAY)) {
+        if (!isset($filtros['order']) || abs($filtros['order']) < 1 || abs($filtros['order']) > count(self::ORDER_ARRAY)) {
             $order = 1;
         } else {
             $order = (int) $filtros['order'];
         }
         return $order;
+    }
+
+    /**
+     * En función de si el número pasado como param es positivo o negativo 
+     * devuelve asc o desc para concatenarlo a la query
+     * @param int $order 
+     * @return type 
+     */
+    function getSentido(int $order) {
+        return ($order >= 0) ? 'asc' : 'desc';
+    }
+    
+    function getPage($filtros) : int{
+        if(isset($filtros['page']) && filter_var($filtros['page'], FILTER_VALIDATE_INT) && $filtros['page'] > 0){
+            return (int)$filtros['page'];
+        }
+        else{
+            return 1;
+        }
     }
 }
